@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -33,6 +35,8 @@ namespace ssl_renewal_watcher
                     }
                 };
 
+                var tasks = new List<Task>();
+
                 using (var client = new HttpClient(handler))
                 {
                     var pattern = "((?=www)|(?=transparencia)).*.gov.br";
@@ -41,11 +45,14 @@ namespace ssl_renewal_watcher
                     {
                         var match = Regex.Match(site.ToString(), pattern);
 
-                        var url = $"https://{match.Value}";
-
-                        client.GetAsync(url);
+                        if (match.Success)
+                            Task.Run(async () => await client.GetAsync($"https://{match.Value}"));
+                        else
+                            Console.WriteLine($"Skip: {site.ToString()}");
                     }
                 }
+
+                Task.WaitAll(tasks.ToArray());
             }
 
             Console.WriteLine(DateTime.Now);
