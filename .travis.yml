@@ -1,0 +1,4 @@
+﻿language: csharp
+solution: ssl-renewal-watcher.sln
+script:
+  - xbuild /p:Configuration=Release ssl-renewal-watcher.sln
