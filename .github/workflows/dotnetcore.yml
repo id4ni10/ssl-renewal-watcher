@@ -24,9 +24,5 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - task: DotNetCoreCLI@2
-      run: dotnet publish
-      inputs:
-        command: publish
-        publishWebProjects: False
-        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: True
+      run: dotnet publish      
+      zipAfterPublish: True
