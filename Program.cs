@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -29,33 +27,38 @@ namespace ssl_renewal_watcher
 
                     ServerCertificateCustomValidationCallback = (sender, certificate, chain, error) =>
                     {
-                        File.WriteAllBytes(@$"{Environment.CurrentDirectory}/certificate/{sender.RequestUri.Host}.cer", certificate.GetRawCertData());
+                        var pem = $"-----BEGIN CERTIFICATE-----\r\n{Convert.ToBase64String(certificate.RawData, Base64FormattingOptions.InsertLineBreaks)}\r\n-----END CERTIFICATE-----";
+
+                        File.WriteAllText(@$"{Environment.CurrentDirectory}/certificate/{(certificate.Verify() ? "valid" : "invalid")}/{sender.RequestUri.Host}.cer", pem);
 
                         return true;
                     }
                 };
 
-                var tasks = new List<Task>();
+                var client = new HttpClient(handler);
 
-                using (var client = new HttpClient(handler))
+                var pattern = "((?=www)|(?=transparencia)).*.gov.br";
+
+                foreach (var site in sites)
                 {
-                    var pattern = "((?=www)|(?=transparencia)).*.gov.br";
-
-                    foreach (var site in sites)
+                    try
                     {
                         var match = Regex.Match(site.ToString(), pattern);
 
                         if (match.Success)
-                            Task.Run(async () => await client.GetAsync($"https://{match.Value}"));
+                            client.GetAsync($"https://{match.Value}").Wait();
                         else
                             Console.WriteLine($"Skip: {site.ToString()}");
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Err: {site.ToString()}");
+                    }
                 }
-
-                Task.WaitAll(tasks.ToArray());
             }
 
             Console.WriteLine(DateTime.Now);
         }
     }
 }
+
