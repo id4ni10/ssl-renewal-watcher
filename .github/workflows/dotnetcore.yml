@@ -24,4 +24,5 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: release
-      run: dotnet publish     
+      run: dotnet pack --configuration Release
+      run: dotnet nuget push "bin/Release/ssl-renewal-watcher.1.0.0.nupkg" --source "github"
