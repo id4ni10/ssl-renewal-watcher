@@ -23,6 +23,5 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
-    - task: DotNetCoreCLI@2
-      run: dotnet publish      
-      zipAfterPublish: True
+    - name: release
+      run: dotnet publish     
