@@ -20,9 +20,8 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore    
+      run: dotnet build --configuration Release --no-restore
     - name: pack
       run: |
-        run: dotnet pack --configuration Release
         mkdir ${{ github.workspace }}/package
         dotnet pack --no-build -c Release --output "${{ github.workspace }}/package"
