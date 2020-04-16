@@ -25,3 +25,8 @@ jobs:
       run: |
         mkdir ${{ github.workspace }}/package
         dotnet pack --no-build -c Release --output "${{ github.workspace }}/package"
+    - uses: actions/upload-artifact@v1
+      with:
+        name: nuget
+        path: ${{ github.workspace }}/package
+      name: 'Upload Package'
