@@ -20,9 +20,9 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: zip
-      run: dotnet pack --configuration Release
-      zipAfterPublish: true
+      run: dotnet build --configuration Release --no-restore    
+    - name: pack
+      run: |
+        run: dotnet pack --configuration Release
+        mkdir ${{ github.workspace }}/package
+        dotnet pack --no-build -c Release --output "${{ github.workspace }}/package"
